@@ -54,6 +54,22 @@ public class MascotaService {
         try {
             // Buscamos la mascota que ya existe en la BD
             Mascota mascotaEnBD = mascotaRepository.findByCodigoMicrochip(codigoMicrochip).orElse(null);
+            
+            if (datosNuevos.getNombre() == null || datosNuevos.getNombre().trim().isEmpty()) {
+                throw new IllegalArgumentException("El nombre es obligatorio.");
+            }
+
+            if (datosNuevos.getEspecie() == null || datosNuevos.getEspecie().trim().isEmpty()) {
+                throw new IllegalArgumentException("la especie es obligatorio.");
+            }
+
+            if (datosNuevos.getRaza() == null || datosNuevos.getRaza().trim().isEmpty()) {
+                throw new IllegalArgumentException("la raza es obligatorio.");
+            }
+
+            if (datosNuevos.getEdad() == null ) {
+                throw new IllegalArgumentException("la edad es obligatorio.");
+            }
 
             // Validación
             if (mascotaEnBD != null) {
