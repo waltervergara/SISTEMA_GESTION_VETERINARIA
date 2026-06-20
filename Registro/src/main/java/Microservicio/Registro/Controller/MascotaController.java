@@ -6,6 +6,7 @@ import Microservicio.Registro.Modelo.Propietario;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -31,7 +32,8 @@ public class MascotaController {
 
     //===========GUARDAR UNA NUEVA MASCOTA=======
     //DOCUMENTACION SWAGERR UI
-    @Operation(summary = "Guardar una nueva mascota")
+    @Operation(summary = "Guardar una nueva mascota",
+            description = "Registra una nueva mascota en el sistema junto a su propietario")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201" , description = "La mascota se a registrado con exito",
                     content = @Content(mediaType = "application/json",
@@ -41,13 +43,17 @@ public class MascotaController {
                             schema = @Schema(type = "string", example = "La masctoa ya existe"))),
             @ApiResponse(responseCode = "400" , description = "Url mal escrita",
                     content = @Content(mediaType = "text/plain",
-                            schema = @Schema(type = "String", example = "Error la ruta o link que intentas consultar no existe"))),
+                            schema = @Schema(type = "string", example = "Error la ruta o link que intentas consultar no existe"))),
             @ApiResponse(responseCode = "500" , description = "Error interno en el servidor",
                     content = @Content(mediaType = "text/plain",
                             schema = @Schema(type = "string", example = "Error interno al guardar en la base de datos"))),
     })
      @PostMapping()
-    public ResponseEntity<?> guardarMascota(@Valid@RequestBody Mascota mascota) {
+    public ResponseEntity<?> guardarMascota(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+            content = @Content(examples = @ExampleObject(
+                    value = "{\"codigoMicrochip\":\"9851210123456\",\"nombre\":\"Firulais\",\"edad\":3,\"año_nacimiento\":2023,\"especie\":\"Perro\",\"raza\":\"Pastor Alemán\",\"propietario\":{\"runPropietario\":\"12.345.678-9\"}}"
+            ))
+    )@Valid@RequestBody Mascota mascota) {
         try {
             Optional<Mascota> resultado = mascotaService.GuardarMascota(mascota);
             
@@ -67,23 +73,24 @@ public class MascotaController {
   
     //BUSCAR MASCOTA POR CHIP
     //DOCUMENTACION SWAGERR UI
-    @Operation(summary = "Revisar datos de una mascota")
+    @Operation(summary = "Revisar datos de una mascota",
+            description = "Busca y retorna la información de una mascota según su código de microchip")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200" , description = "Se encuentra la mascota",
-                    content = @Content(mediaType = "aplication/json",
+                    content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = Mascota.class))),
             @ApiResponse(responseCode = "404" , description = "No se encuentra la mascota",
                     content = @Content(mediaType = "text/plain",
-                            schema = @Schema(type = "String", example = "No se a encontrado la mascota"))),
+                            schema = @Schema(type = "string", example = "No se a encontrado la mascota"))),
             @ApiResponse(responseCode = "400" , description = "Url mal escrita",
                     content = @Content(mediaType = "text/plain",
-                            schema = @Schema(type = "String" , example = "Error la ruta o link que intentas consultar no existe"))),
+                            schema = @Schema(type = "string" , example = "Error la ruta o link que intentas consultar no existe"))),
             @ApiResponse(responseCode = "500" , description = "Error con el servidor/base de datos",
                     content = @Content(mediaType = "text/plain",
                             schema = @Schema(type = "string" , example = "Error con el servidor")))
     })
    @GetMapping("/buscar/{codigoMicrochip}")
-    public ResponseEntity<?> buscarPorChip(@Parameter(name = "codigoMascota" , description = "Codigo de la mascota a consultar",example = "9851210123456", required = true)@PathVariable String codigoMicrochip) {
+    public ResponseEntity<?> buscarPorChip(@Parameter(name = "codigoMicrochip" , description = "Codigo de la mascota a consultar",example = "9851210123456", required = true)@PathVariable String codigoMicrochip) {
         try {
             Optional<Mascota> mascota = mascotaService.buscarPorChip(codigoMicrochip);
             
@@ -101,8 +108,34 @@ public class MascotaController {
 
 
     //ACTUALIZAR DATOS DE UNA MASCOTA
+    //DOCUMENTACION SWAGERR UI
+    @Operation(summary = "Editar datos de una mascota",
+            description = "Actualiza los datos de una mascota existente usando su código de microchip")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200" , description = "Mascota actualizada con exito",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Mascota.class))),
+            @ApiResponse(responseCode = "404" , description = "No se encuentra la mascota",
+                    content = @Content(mediaType = "text/plain",
+                            schema = @Schema(type = "string", example = "No se a encontrado la mascota"))),
+            @ApiResponse(responseCode = "400" , description = "Url mal escrita",
+                    content = @Content(mediaType = "text/plain",
+                            schema = @Schema(type = "string" , example = "Error la ruta o link que intentas consultar no existe"))),
+            @ApiResponse(responseCode = "500" , description = "Error con el servidor/base de datos",
+                    content = @Content(mediaType = "text/plain",
+                            schema = @Schema(type = "string" , example = "Error con el servidor")))
+    })
     @PutMapping("/actualizar/{codigoMicrochip}")
-    public ResponseEntity<?> actualizarMascota(@PathVariable String codigoMicrochip, @RequestBody Mascota datos) {
+    public ResponseEntity<?> actualizarMascota(@Parameter(
+            name = "codigoMicrochip",
+            description = "Código de microchip de la mascota a editar",
+            example = "9851210123456",
+            required = true
+    )@PathVariable String codigoMicrochip,@io.swagger.v3.oas.annotations.parameters.RequestBody(
+            content = @Content(examples = @ExampleObject(
+                    value = "{\"nombre\":\"Firulais\",\"edad\":3,\"año_nacimiento\":2023,\"especie\":\"Perro\",\"raza\":\"Pastor Alemán\",\"propietario\":{\"runPropietario\":\"12.345.678-9\"}}"
+            ))
+    ) @RequestBody Mascota datos) {
         try {
             Mascota actualizada = mascotaService.ActualizarMascota(codigoMicrochip, datos);
             
@@ -120,8 +153,30 @@ public class MascotaController {
 
     
     //ELIMINAR UNA MASCOTA POR CHIP
+    //DOCUMENTACION SWAGERR UI
+    @Operation(summary = "Eliminar a una mascota de la base de datos",
+            description = "Elimina permanentemente el registro de una mascota según su código de microchip")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200" , description = "Se elimina la mascota correctamente",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(type = "string" , example = "Se a eliminado correctamente la mascota"))),
+            @ApiResponse(responseCode = "404" , description = "No se encuentra la mascota a eliminar",
+                    content = @Content(mediaType = "text/plain",
+                            schema = @Schema(type = "string", example = "No se a encontrado la mascota"))),
+            @ApiResponse(responseCode = "400" , description = "Url mal escrita",
+                    content = @Content(mediaType = "text/plain",
+                            schema = @Schema(type = "string" , example = "Error la ruta o link que intentas consultar no existe"))),
+            @ApiResponse(responseCode = "500" , description = "Error con el servidor/base de datos",
+                    content = @Content(mediaType = "text/plain",
+                            schema = @Schema(type = "string" , example = "Error con el servidor")))
+    })
   @DeleteMapping("/eliminar/{codigoMicrochip}")
-    public ResponseEntity<?> eliminarMascota(@PathVariable String codigoMicrochip) {
+    public ResponseEntity<?> eliminarMascota(@Parameter(
+            name = "codigoMicrochip",
+            description = "Código de microchip de la mascota a eliminar",
+            example = "9851210123456",
+            required = true
+    )@PathVariable String codigoMicrochip) {
         try {
             boolean eliminado = mascotaService.eliminarMascotaExistente(codigoMicrochip);
             
@@ -148,15 +203,16 @@ public class MascotaController {
     //Link para documentacion Swagger UI
     //http://localhost:8080/swagger-ui.html
 
-  //{
-  //"codigoMicrochip": "9851210123456",
-  //"nombre": "Firulais",
-  //"edad": 3,
-  //"año_nacimiento": 2023,
-  //"especie": "Perro",
-  //"raza": "Pastor Alemán",
-  //"propietario": {
+    //====EJEMPLO EN FORMATO JASON====
+    //{
+    //"codigoMicrochip": "9851210123456",
+    //"nombre": "Firulais",
+    //"edad": 3,
+    //"año_nacimiento": 2023,
+    //"especie": "Perro",
+    //"raza": "Pastor Alemán",
+    //"propietario": {
     //"runPropietario": "4"
-  //}
-  //}
+    //}
+    //}
 }

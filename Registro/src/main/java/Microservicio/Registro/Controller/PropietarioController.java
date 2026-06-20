@@ -30,7 +30,8 @@ public class PropietarioController {
 
     //===========GUARDAR=============
     //DOCUMENTACION SWAGERR UI
-    @Operation(summary = "Guardar un nuevo propietario")
+    @Operation(summary = "Guardar un nuevo propietario",
+            description = "Registra un nuevo propietario en el sistema usando su RUN como identificador único")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201" , description = "El propietario se a creado con exito",
                 content = @Content(mediaType = "application/json",
@@ -40,13 +41,17 @@ public class PropietarioController {
                     schema = @Schema(type = "string", example = "El Propietario ya existe"))),
             @ApiResponse(responseCode = "400" , description = "Url mal escrita",
                 content = @Content(mediaType = "text/plain",
-                    schema = @Schema(type = "String", example = "Error la ruta o link que intentas consultar no existe"))),
+                    schema = @Schema(type = "string", example = "Error la ruta o link que intentas consultar no existe"))),
             @ApiResponse(responseCode = "500" , description = "Error interno en el servidor",
                 content = @Content(mediaType = "text/plain",
                     schema = @Schema(type = "string", example = "Error interno al guardar en la base de datos"))),
     })
     @PostMapping()
-    public ResponseEntity<?> guardarPropietario(@Valid@RequestBody Propietario propietario) {
+    public ResponseEntity<?> guardarPropietario(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+            content = @Content(examples = @ExampleObject(
+                    value = "{\"runPropietario\":\"12.345.678-9\",\"nombre\":\"Alonso\",\"apellido\":\"Contreras\",\"correo\":\"goku@gmail.com\",\"telefono\":\"+56954203889\"}"
+            ))
+    )@Valid@RequestBody Propietario propietario) {
         try {
             Optional<Propietario> resultado = propietarioService.guardarPropietario(propietario);
             
@@ -65,17 +70,18 @@ public class PropietarioController {
 
     //========BUSCAR POR RUN========
     //DOCUMENTACION SWAGERR UI
-    @Operation(summary = "Revisar datos de un propietario")
+    @Operation(summary = "Revisar datos de un propietario",
+            description = "Busca y retorna la información de un propietario según su RUN en formato chileno")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200" , description = "Se encuentra el propietario",
-                content = @Content(mediaType = "aplication/json",
+                content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = Propietario.class))),
             @ApiResponse(responseCode = "404" , description = "No se encuentra el propietario",
                 content = @Content(mediaType = "text/plain",
-                    schema = @Schema(type = "String", example = "No se a encontrado al propietario"))),
+                    schema = @Schema(type = "string", example = "No se a encontrado al propietario"))),
             @ApiResponse(responseCode = "400" , description = "Url mal escrita",
                 content = @Content(mediaType = "text/plain",
-                    schema = @Schema(type = "String" , example = "Error la ruta o link que intentas consultar no existe"))),
+                    schema = @Schema(type = "string" , example = "Error la ruta o link que intentas consultar no existe"))),
             @ApiResponse(responseCode = "500" , description = "Error con el servidor/base de datos",
                 content = @Content(mediaType = "text/plain",
                     schema = @Schema(type = "string" , example = "Error con el servidor")))
@@ -99,23 +105,28 @@ public class PropietarioController {
 
     //==========ACTUALIZAR==========
     //DOCUMENTACION SWAGERR UI
-    @Operation(summary = "Editar datos de un propietario")
+    @Operation(summary = "Editar datos de un propietario",
+            description = "Actualiza los datos de un propietario existente usando su RUN como identificador")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200" , description = "Propietario Actualizado con exito",
-                    content = @Content(mediaType = "aplication/json",
+                    content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = Propietario.class))),
             @ApiResponse(responseCode = "404" , description = "No se encuentra el propietario",
                     content = @Content(mediaType = "text/plain",
-                            schema = @Schema(type = "String", example = "No se a encontrado al propietario"))),
+                            schema = @Schema(type = "string", example = "No se a encontrado al propietario"))),
             @ApiResponse(responseCode = "400" , description = "Url mal escrita",
                     content = @Content(mediaType = "text/plain",
-                            schema = @Schema(type = "String" , example = "Error la ruta o link que intentas consultar no existe"))),
+                            schema = @Schema(type = "string" , example = "Error la ruta o link que intentas consultar no existe"))),
             @ApiResponse(responseCode = "500" , description = "Error con el servidor/base de datos",
                     content = @Content(mediaType = "text/plain",
                             schema = @Schema(type = "string" , example = "Error con el servidor")))
     })
     @PutMapping("/actualizar/{runPropietario}")
-    public ResponseEntity<?> actualizarPropietario(@Parameter(name = "runPropietario", description = "Run del propietario a editar los datos",example = "12.345.678-9", required = true
+    public ResponseEntity<?> actualizarPropietario(@Parameter(
+            name = "runPropietario",
+            description = "Run del propietario a editar los datos",
+            example = "12.345.678-9",
+            required = true
     )@PathVariable String runPropietario,@io.swagger.v3.oas.annotations.parameters.RequestBody(
             content = @Content(examples = @ExampleObject(
                     value = "{\"nombre\":\"Alonso\",\"apellido\":\"Contreras\",\"correo\":\"goku@gmail.com\",\"telefono\":\"+56954203889\"}"
@@ -138,23 +149,24 @@ public class PropietarioController {
 
     //=========ELIMINAR========
     //DOCUMENTACION SWAGERR UI
-    @Operation(summary = "Eliminar a un propietario de la base de datos")
+    @Operation(summary = "Eliminar a un propietario de la base de datos",
+            description = "Elimina permanentemente el registro de un propietario según su RUN. Si tiene mascotas asociadas en la base de datos puede bloquear la operación")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200" , description = "Se elimina al propietario correctamente",
-                    content = @Content(mediaType = "aplication/json",
-                            schema = @Schema(type = "String" , example = "Se a eliminado correctamente al propietario"))),
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(type = "string" , example = "Se a eliminado correctamente al propietario"))),
             @ApiResponse(responseCode = "404" , description = "No se encuentra el propietario a eliminar",
                     content = @Content(mediaType = "text/plain",
-                            schema = @Schema(type = "String", example = "No se a encontrado al propietario"))),
+                            schema = @Schema(type = "string", example = "No se a encontrado al propietario"))),
             @ApiResponse(responseCode = "400" , description = "Url mal escrita",
                     content = @Content(mediaType = "text/plain",
-                            schema = @Schema(type = "String" , example = "Error la ruta o link que intentas consultar no existe"))),
+                            schema = @Schema(type = "string" , example = "Error la ruta o link que intentas consultar no existe"))),
             @ApiResponse(responseCode = "500" , description = "Error con el servidor/base de datos",
                     content = @Content(mediaType = "text/plain",
                             schema = @Schema(type = "string" , example = "Error con el servidor")))
     })
     @DeleteMapping("/eliminar/{runPropietario}")
-    public ResponseEntity<?> eliminarPropietario(@Parameter(name = "runPropietario" , description = "Rut del propietario a elimnar" , example = "12.345.678-9", required = true)@PathVariable String runPropietario) {
+    public ResponseEntity<?> eliminarPropietario(@Parameter(name = "runPropietario" , description = "Rut del propietario a eliminar" , example = "12.345.678-9", required = true)@PathVariable String runPropietario) {
         try {
             //recibe el true y lo guarda
             boolean eliminado = propietarioService.eliminarPropietarioporRun(runPropietario);
