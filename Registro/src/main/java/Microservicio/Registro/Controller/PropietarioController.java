@@ -58,7 +58,7 @@ public class PropietarioController {
 
     //ACTUALIZAR
     @PutMapping("/actualizar/{runPropietario}")
-    public ResponseEntity<?> actualizarPropietario(@PathVariable String runPropietario, @RequestBody Propietario datos) {
+    public ResponseEntity<?> actualizarPropietario(@PathVariable String runPropietario, @Valid@RequestBody Propietario datos) {
         try {
             Propietario actualizado = propietarioService.actualizarPropietario(runPropietario, datos);
             

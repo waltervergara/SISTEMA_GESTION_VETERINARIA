@@ -7,7 +7,7 @@ import java.util.List;
 import Historial.HistorialMascota.Modelo.CitaDTO;
 
 // "url" debe apuntar al puerto donde corre tu Microservicio de Citas (ej: 8082)
-@FeignClient(name = "microservicio-citas", url = "http://localhost:8082")
+@FeignClient(name = "Citas")
 public interface CitaClient {
 
     // Este endpoint debe coincidir con el que tengas en el controlador de Citas

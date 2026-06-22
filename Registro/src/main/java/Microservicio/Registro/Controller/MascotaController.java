@@ -61,7 +61,7 @@ public class MascotaController {
 
     //ACTUALIZAR DATOS DE UNA MASCOTA
     @PutMapping("/actualizar/{codigoMicrochip}")
-    public ResponseEntity<?> actualizarMascota(@PathVariable String codigoMicrochip, @RequestBody Mascota datos) {
+    public ResponseEntity<?> actualizarMascota(@PathVariable String codigoMicrochip, @Valid@RequestBody Mascota datos) {
         try {
             Mascota actualizada = mascotaService.ActualizarMascota(codigoMicrochip, datos);
             

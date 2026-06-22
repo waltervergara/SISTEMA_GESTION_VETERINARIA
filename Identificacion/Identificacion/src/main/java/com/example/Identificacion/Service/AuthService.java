@@ -1,9 +1,11 @@
 package com.example.Identificacion.Service;
 
 import com.example.Identificacion.Client.EmpleadoClient;
+import com.example.Identificacion.Client.PropietarioClient;
 import com.example.Identificacion.Dto.AuthResponse;
-import com.example.Identificacion.Dto.EmpleadoResponse;
+import com.example.Identificacion.Dto.EmpleadoRequest;
 import com.example.Identificacion.Dto.LoginRequest;
+import com.example.Identificacion.Dto.PropietarioRequest;
 import com.example.Identificacion.Dto.RegistroRequest;
 import com.example.Identificacion.Model.Rol;
 import com.example.Identificacion.Model.Usuario;
@@ -12,11 +14,10 @@ import com.example.Identificacion.Repository.UsuarioRepository;
 import com.example.Identificacion.Security.JwtUtil;
 
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.Nullable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -30,78 +31,96 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final EmpleadoClient empleadoClient;
+    private final PropietarioClient propietarioClient; // <--- NUEVO CLIENTE
 
-    @Transactional // Asegura la atomicidad de la operación en la BD
+    public AuthResponse login(LoginRequest request) {
+        Usuario usuario = usuarioRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new RuntimeException("Usuario o contraseña incorrectos"));
+
+        if (!passwordEncoder.matches(request.getPassword(), usuario.getPassword())) {
+            throw new RuntimeException("Usuario o contraseña incorrectos");
+        }
+
+        String token = jwtUtil.generateToken(usuario);
+        Set<String> roles = usuario.getRoles().stream().map(Rol::getName).collect(Collectors.toSet());
+
+        return new AuthResponse(token, usuario.getId(), usuario.getUsername(), roles);
+    }
+
     public AuthResponse register(RegistroRequest request) {
-        
-        // 1. Validaciones preventivas locales
         if (usuarioRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("El nombre de usuario ya está en uso.");
+            throw new RuntimeException("El nombre de usuario ya está en uso");
         }
         if (usuarioRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("El correo electrónico ya está registrado.");
+            throw new RuntimeException("El email ya está registrado");
         }
 
-        // 2. Mapeo y asignación de roles
-        Set<Rol> roles = new HashSet<>();
-        if (request.getRoles() == null || request.getRoles().isEmpty()) {
-            Rol defaultRol = rolRepository.findByName("ROLE_OWNER")
-                    .orElseThrow(() -> new RuntimeException("Error: Rol por defecto no encontrado."));
-            roles.add(defaultRol);
-        } else {
-            for (String r : request.getRoles()) {
-                Rol rol = rolRepository.findByName(r)
-                        .orElseThrow(() -> new RuntimeException("Error: El rol " + r + " no existe."));
-                roles.add(rol);
-            }
-        }
-
-        // Determinar si el usuario intenta registrarse como un empleado
-        boolean esEmpleado = roles.stream()
-                .anyMatch(r -> r.getName().equals("ROLE_VET") || r.getName().equals("ROLE_ASSISTANT"));
-
-        // 3. EVALUACIÓN CON EL MICROSERVICIO DE EMPLEADOS (Basada en Email)
-        if (esEmpleado) {
-            EmpleadoResponse empleado;
-            try {
-                // Solicitamos los datos al microservicio de empleados usando el email del formulario
-                empleado = empleadoClient.obtenerEmpleadoPorCorreo(request.getEmail());
-            } catch (Exception e) {
-                // Si el MS de empleados responde con un error o no está disponible
-                throw new RuntimeException("No se pudo verificar el empleado. El sistema de Recursos Humanos no responde o el correo no pertenece a un empleado.");
-            }
-
-            if (empleado == null) {
-                throw new RuntimeException("Evaluación fallida: No existe ningún empleado contratado con este correo electrónico.");
-            }
-
-            // EVALUACIÓN DE CORRESPONDENCIA ADICIONAL (Opcional, por si los campos del JSON varían de nombre)
-            if (!empleado.getGmail().equalsIgnoreCase(request.getEmail())) {
-                throw new RuntimeException("Evaluación fallida: El correo electrónico de registro no coincide con el registro oficial.");
-            }
-            
-            System.out.println(">>> Evaluación exitosa para el empleado verificado: " + empleado.getNombre());
-        }
-
-        // 4. Si la evaluación pasa con éxito, procedemos a guardar el usuario en vet_identity_db
         Usuario usuario = new Usuario();
         usuario.setUsername(request.getUsername());
         usuario.setPassword(passwordEncoder.encode(request.getPassword()));
         usuario.setEmail(request.getEmail());
-        usuario.setRoles(roles);
         usuario.setIsActive(true);
 
+        Set<Rol> roles = new HashSet<>();
+        if (request.getRoles() == null || request.getRoles().isEmpty()) {
+            Rol rolOwner = rolRepository.findByName("ROLE_OWNER")
+                    .orElseThrow(() -> new RuntimeException("Rol ROLE_OWNER no encontrado"));
+            roles.add(rolOwner);
+        } else {
+            for (String rolName : request.getRoles()) {
+                Rol rol = rolRepository.findByName(rolName)
+                        .orElseThrow(() -> new RuntimeException("Rol " + rolName + " no encontrado"));
+                roles.add(rol);
+            }
+        }
+        usuario.setRoles(roles);
         usuarioRepository.save(usuario);
 
-        // 5. Generar Token y respuesta
+        // --- LÓGICA DE COMUNICACIÓN ---
+        boolean esEmpleado = roles.stream()
+                .anyMatch(rol -> rol.getName().equals("ROLE_VET") || rol.getName().equals("ROLE_ASSISTANT"));
+        
+        boolean esDueno = roles.stream()
+                .anyMatch(rol -> rol.getName().equals("ROLE_OWNER"));
+
+        if (esEmpleado) {
+            try {
+                String cargo = roles.stream()
+                        .filter(rol -> rol.getName().equals("ROLE_VET"))
+                        .findFirst()
+                        .map(rol -> "Veterinario")
+                        .orElse("Asistente");
+
+                EmpleadoRequest empleadoRequest = new EmpleadoRequest(
+                        "TEMP-" + usuario.getId(), usuario.getUsername(), LocalDate.of(2000, 1, 1),
+                        cargo, usuario.getEmail(), "000000000"
+                );
+                empleadoClient.crearEmpleado(empleadoRequest);
+            } catch (Exception e) {
+                System.out.println(">>> ERROR MS Empleados: " + e.getMessage());
+            }
+        }
+
+        // NUEVA LÓGICA PARA PROPIETARIOS
+        if (esDueno) {
+            try {
+                PropietarioRequest propietarioRequest = new PropietarioRequest(
+                        "TEMP-" + usuario.getId(),   // runPropietario temporal
+                        usuario.getUsername(),       // nombre (usamos el username)
+                        "Pendiente",                 // apellido temporal (porque no lo pedimos en el registro)
+                        usuario.getEmail(),          // correo
+                        "000000000"                  // telefono temporal
+                );
+                propietarioClient.crearPropietario(propietarioRequest);
+            } catch (Exception e) {
+                System.out.println(">>> ERROR MS Propietarios: " + e.getMessage());
+            }
+        }
+        // ------------------------------------
+
         String token = jwtUtil.generateToken(usuario);
         Set<String> rolesStr = usuario.getRoles().stream().map(Rol::getName).collect(Collectors.toSet());
 
         return new AuthResponse(token, usuario.getId(), usuario.getUsername(), rolesStr);
-    }
-
-    public @Nullable Object login(LoginRequest request) {
-        // Dejamos esto listo para cuando revisemos el flujo de inicio de sesión
-        throw new UnsupportedOperationException("Unimplemented method 'login'");
     }
 }

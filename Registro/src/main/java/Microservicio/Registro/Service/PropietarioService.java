@@ -53,31 +53,6 @@ public class PropietarioService {
 
     // Actualizar
     public Propietario actualizarPropietario(String run_propietario, Propietario datosNuevos) {
-        
-       if (datosNuevos == null) {
-        throw new IllegalArgumentException("Los datos no pueden ser nulos.");
-       }
-
-       if (datosNuevos.getNombre() == null || datosNuevos.getNombre().trim().isEmpty()) {
-        throw new IllegalArgumentException("El nombre es obligatorio.");
-       }
-
-       if (datosNuevos.getApellido() == null || datosNuevos.getApellido().trim().isEmpty()) {
-        throw new IllegalArgumentException("El apellido es obligatorio.");
-       }
-
-       if (datosNuevos.getCorreo() == null || datosNuevos.getCorreo().trim().isEmpty()) {
-        throw new IllegalArgumentException("El correo es obligatorio.");
-       }
-
-       if (datosNuevos.getTelefono() == null || datosNuevos.getTelefono().trim().isEmpty()) {
-        throw new IllegalArgumentException("El teléfono es obligatorio.");
-       }
-     
-
-
-
-
         try {
             Propietario propietarioEnBD = propietarioRepository.findByRunPropietario(run_propietario).orElse(null);
 

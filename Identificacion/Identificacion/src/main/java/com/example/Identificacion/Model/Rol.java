@@ -1,4 +1,3 @@
-
 package com.example.Identificacion.Model;
 
 import jakarta.persistence.*;
