@@ -1,0 +1,31 @@
+#Con YML SE OBTIENE UN MEJOR ESTRUCTURA Y ES MÁS LEIBLE
+
+server:
+  port: 8080
+
+spring:
+  application:
+    name: Registro
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/Registro_Paciente
+    username: root
+    password: ""
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+  flyway:
+    enabled: true
+    repeatable-sql-migration-prefix: true
+
+  web:
+    error:
+      include-binding-errors: always
+      include-message: always
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8100/eureka/
