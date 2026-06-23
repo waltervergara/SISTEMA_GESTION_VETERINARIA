@@ -1,0 +1,40 @@
+server:
+  port: 9090 # La puerta de entrada principal para el sistema
+
+---
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: false # Le permite al Gateway buscar los nombres de los microservicios en Eureka
+          routes:
+            - id: ruta-citas
+              uri: lb://Citas # Debe coincidir exactamente con el name en su YML (o CITAS en mayúsculas si Eureka lo registra así)
+              predicates:
+                - Path=/api/v1/citas/**
+            - id: ruta-empleados
+              uri: lb://EMPLEADOS # Nombre exacto que pusiste en su YML
+              predicates:
+                - Path=/api/v1/registro/empleados/**
+            #Ruta del microservicio "registro"
+            - id: ruta-registro #en YAMl esto significa un nuevo elemento en la lista de rutas
+              uri: lb://REGISTRO # 'lb://' activa el balanceador de carga usando el nombre en Eureka
+              predicates:
+                - Path=/api/v1/registro/** # Cualquier petición que empiece con esto, se desvía a Registro
+
+
+---
+#La conexion con eureka
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8100/eureka/
+---
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE
