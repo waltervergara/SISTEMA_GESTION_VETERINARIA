@@ -12,6 +12,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+// Importaciones obligatorias para HATEOAS
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+import org.springframework.hateoas.Link;
+
 import java.util.Optional;
 
 @RestController
@@ -46,7 +50,17 @@ public class CitaMedicaController {
             Optional<CitaMedicaDTO> citaCompleta = citaMedicaService.obtenerDetalleCompletoCita(codigoConsulta);
 
             if (citaCompleta.isPresent()) {
-                return ResponseEntity.ok(citaCompleta.get());
+                CitaMedicaDTO dto = citaCompleta.get();
+                
+                // l método /mascota/{codigoMicrochip} devuelve una List<CitaMedicaDTO> (es decir, una lista con todas las citas de la mascota). 
+                // En HATEOAS, cuando devolvemos colecciones, debemos inyectar los enlaces a cada elemento individual de esa lista recorriéndola.
+                Link selfLink = linkTo(methodOn(CitaMedicaController.class).obtenerDetalleCita(codigoConsulta)).withSelfRel();
+                Link updateLink = linkTo(methodOn(CitaMedicaController.class).actualizarCita(codigoConsulta, null)).withRel("actualizar");
+                Link deleteLink = linkTo(methodOn(CitaMedicaController.class).eliminarPorCodigoConsulta(codigoConsulta)).withRel("eliminar");
+                
+                dto.add(selfLink, updateLink, deleteLink);
+
+                return ResponseEntity.ok(dto);
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body("No se encontró ninguna cita con el código: " + codigoConsulta);
@@ -96,19 +110,31 @@ public class CitaMedicaController {
             List<CitaMedicaDTO> listaCitas = citaMedicaService.obtenerCitasPorMicrochip(codigoMicrochip);
 
             if (!listaCitas.isEmpty()) {
+                
+                // Recorremos cada cita para asi poder ingresar los enlaces a cada una de ellas 
+                for (CitaMedicaDTO dto : listaCitas) {
+                    Link selfLink = linkTo(methodOn(CitaMedicaController.class)
+                            .obtenerDetalleCita(dto.getCodigoConsulta())).withSelfRel();
+                    
+                    Link updateLink = linkTo(methodOn(CitaMedicaController.class)
+                            .actualizarCita(dto.getCodigoConsulta(), null)).withRel("actualizar");
+                    
+                    dto.add(selfLink, updateLink);
+                }
+
                 return ResponseEntity.ok(listaCitas);
             } else {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); 
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al obtener las citas: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al obtener las citas: " + e.getMessage());
+        }
     }
 }
-
     //links de prueba
 
     //post-http://localhost:8082/api/v1/citas/guardar
     //get-http://localhost:8082/api/v1/citas/detalle/
     //put-http://localhost:8082/api/v1/citas/actualizar/
     //delete-http://localhost:8082/api/v1/citas/eliminar/
-}
