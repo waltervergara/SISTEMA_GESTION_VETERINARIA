@@ -1,0 +1,25 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: Citas
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/Registro_Citas
+    username: root
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+  flyway:
+    enabled: true
+    repeatable-sql-migration-prefix: true
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8100/eureka/
+
