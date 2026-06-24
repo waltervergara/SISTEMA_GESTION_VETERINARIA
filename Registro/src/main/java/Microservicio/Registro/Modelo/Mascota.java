@@ -13,15 +13,18 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.hateoas.RepresentationModel;
 
 @Entity
 @Table(name = "Mascota")
+@EqualsAndHashCode(callSuper = false)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(description = "Modelo que representa la mascota en el sistema")
-public class Mascota {
+public class Mascota extends RepresentationModel<Mascota> {
     
     @NotBlank(message = "no puede estar vacio ek codigoMicrochip")
     @Id

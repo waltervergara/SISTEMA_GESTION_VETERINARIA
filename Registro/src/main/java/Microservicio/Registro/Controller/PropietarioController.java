@@ -19,6 +19,8 @@ import Microservicio.Registro.Modelo.Propietario;
 import Microservicio.Registro.Service.PropietarioService;
 import jakarta.validation.Valid;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+
 //@CrossOrigin(origins = "*") // Para evitar problemas de CORS con el frontend
 @RestController
 @RequestMapping("/api/v1/registro/propietarios")
@@ -56,6 +58,14 @@ public class PropietarioController {
             Optional<Propietario> resultado = propietarioService.guardarPropietario(propietario);
             
             if (resultado.isPresent()) {
+                //lo nuevo de Hateoas
+                Propietario p = resultado.get();
+                p.add(linkTo(methodOn(PropietarioController.class)
+                        .buscarPorRun(p.getRunPropietario())).withSelfRel());
+                p.add(linkTo(methodOn(PropietarioController.class)
+                        .actualizarPropietario(p.getRunPropietario(), p)).withRel("actualizar"));
+                p.add(linkTo(methodOn(PropietarioController.class)
+                        .eliminarPropietario(p.getRunPropietario())).withRel("eliminar"));
                 //si el optional viene con algo lo guarda
                 return ResponseEntity.status(HttpStatus.CREATED).body(resultado.get());
             } else {
@@ -92,6 +102,15 @@ public class PropietarioController {
             Optional<Propietario> propietario = propietarioService.buscarPorRun(runPropietario);
             
             if (propietario.isPresent()) {
+                Propietario p = propietario.get();
+
+                // Links HATEOAS
+                p.add(linkTo(methodOn(PropietarioController.class)
+                        .buscarPorRun(runPropietario)).withSelfRel());
+                p.add(linkTo(methodOn(PropietarioController.class)
+                        .actualizarPropietario(runPropietario, p)).withRel("actualizar"));
+                p.add(linkTo(methodOn(PropietarioController.class)
+                        .eliminarPropietario(runPropietario)).withRel("eliminar"));
                 //Cuando lo encuentra y muestra la informacion
                 return ResponseEntity.ok(propietario.get());
             } else {
@@ -136,6 +155,11 @@ public class PropietarioController {
             Propietario actualizado = propietarioService.actualizarPropietario(runPropietario, datos);
             
             if (actualizado != null) {
+                //Links HATEOAS
+                actualizado.add(linkTo(methodOn(PropietarioController.class)
+                        .buscarPorRun(runPropietario)).withSelfRel());
+                actualizado.add(linkTo(methodOn(PropietarioController.class)
+                        .eliminarPropietario(runPropietario)).withRel("eliminar"));
                 //cuando se actualiza con exito
                 return ResponseEntity.ok(actualizado);
             } else {

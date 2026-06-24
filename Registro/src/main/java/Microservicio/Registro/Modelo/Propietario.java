@@ -9,15 +9,18 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.hateoas.RepresentationModel;
 
 @Entity //Entity tratara a esta clase como un tabla de base de datos
 @Table(name = "Propietario")//nombre de la tabla
+@EqualsAndHashCode(callSuper = false)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(description = "Modelo que representa a un propietario en el sistema")
-public class Propietario {
+public class Propietario extends RepresentationModel<Propietario> {
     
     @NotBlank(message = "el run no puede estar en black")
     @Id
