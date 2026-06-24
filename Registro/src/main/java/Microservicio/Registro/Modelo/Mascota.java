@@ -1,5 +1,6 @@
 package Microservicio.Registro.Modelo;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ForeignKey;
@@ -12,41 +13,55 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+
+//Agregar la importación de HATEOAS
+import org.springframework.hateoas.RepresentationModel;
 
 @Entity
 @Table(name = "Mascota")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Mascota {
+//Agregamos esta anotación para evitar conflictos de memoria entre Lombok y HATEOAS
+@EqualsAndHashCode(callSuper = false)
+@Schema(description = "Modelo que representa la mascota en el sistema")
+//Añadir el "extends" a la declaración de la clase
+public class Mascota extends RepresentationModel<Mascota> {
     
     @NotBlank(message = "no puede estar vacio ek codigoMicrochip")
     @Id
     @Column(length = 15 ,nullable = true)
+    @Schema(description = "Codigo identificador de la mascota" , example = "9851210123456")
     private String codigoMicrochip;
 
 
     @NotBlank(message = "el nombre no puede estar en blanco")
     @Column( nullable = false)
+    @Schema(description = "Nombre de la mascota" , example = "Alfredo")
     private String nombre;
     
     @PositiveOrZero(message = "la edad no puede ser negativa")//@PositiveOrZero , esto hace que el numero no pueda ser negativo
     @NotNull(message = "la edad no puede ser null")
     @Column( nullable = false)
+    @Schema(description = "Edad de la mascota" , example = "12")
     private Integer edad;
     
     @PositiveOrZero(message = "el año no puede ser negativo")
     @NotNull(message = "el año no puede ser null")
     @Column(nullable = false)
+    @Schema(description = "Año de nacimiento" , example = "2009/03/13")
     private Integer año_nacimiento;
     
     @NotBlank(message = "la especie no puede estar en blanco")
-    @Column( nullable = false)
+    @Column(nullable = false)
+    @Schema(description = "Especie del animal" , example = "Perro")
     private String especie;
 
     @NotBlank(message = "la raza no puede estar en blanco")
     @Column( nullable = false)
+    @Schema(description = "Raza del animal" , example = "Bulldog")
     private String raza;
    
 

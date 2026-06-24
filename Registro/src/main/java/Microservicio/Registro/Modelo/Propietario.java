@@ -9,15 +9,22 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+
+//Agregar la importación de HATEOAS
+import org.springframework.hateoas.RepresentationModel;
 
 @Entity //Entity tratara a esta clase como un tabla de base de datos
 @Table(name = "Propietario")//nombre de la tabla
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+//Agregamos esta anotación para evitar conflictos de memoria entre Lombok y HATEOAS
+@EqualsAndHashCode(callSuper = false)
 @Schema(description = "Modelo que representa a un propietario en el sistema")
-public class Propietario {
+//Añadir el "extends" a la declaración de la clase
+public class Propietario extends RepresentationModel<Propietario> {
     
     @NotBlank(message = "el run no puede estar en black")
     @Id

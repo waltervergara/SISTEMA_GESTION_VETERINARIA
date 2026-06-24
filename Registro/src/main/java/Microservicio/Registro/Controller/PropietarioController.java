@@ -19,6 +19,11 @@ import Microservicio.Registro.Modelo.Propietario;
 import Microservicio.Registro.Service.PropietarioService;
 import jakarta.validation.Valid;
 
+// IMPORTACIONES HATEOAS AÑADIDAS
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+import org.springframework.hateoas.Link;
+
 //@CrossOrigin(origins = "*") // Para evitar problemas de CORS con el frontend
 @RestController
 @RequestMapping("/api/v1/registro/propietarios")
@@ -86,17 +91,28 @@ public class PropietarioController {
             Optional<Propietario> propietario = propietarioService.buscarPorRun(runPropietario);
             
             if (propietario.isPresent()) {
-                //Cuando lo encuentra y muestra la informacion
-                return ResponseEntity.ok(propietario.get());
+                // 1. Extraemos al propietario del Optional
+                Propietario propietarioEncontrado = propietario.get();
+
+                // 2. Fabricamos los links dinámicos
+                Link selfLink = linkTo(methodOn(PropietarioController.class).buscarPorRun(runPropietario)).withSelfRel();
+                Link updateLink = linkTo(methodOn(PropietarioController.class).actualizarPropietario(runPropietario, null)).withRel("actualizar");
+                Link deleteLink = linkTo(methodOn(PropietarioController.class).eliminarPropietario(runPropietario)).withRel("eliminar");
+
+                // 3. Le agregamos los links al objeto
+                propietarioEncontrado.add(selfLink);
+                propietarioEncontrado.add(updateLink);
+                propietarioEncontrado.add(deleteLink);
+
+                // 4. Devolvemos el propietario con sus links incluidos
+                return ResponseEntity.ok(propietarioEncontrado);
             } else {
-                //cuando no encuentra al propietario
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Propietario no encontrado.");
             }
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-
     //==========ACTUALIZAR==========
     //DOCUMENTACION SWAGERR UI
     @Operation(summary = "Editar datos de un propietario")
