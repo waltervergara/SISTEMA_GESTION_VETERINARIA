@@ -8,8 +8,8 @@
 		<version>4.1.0</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.Tratamiento</groupId>
-	<artifactId>Tratamiento</artifactId>
+	<groupId>com.hospitalizacion</groupId>
+	<artifactId>hospitalizacion</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name/>
 	<description/>

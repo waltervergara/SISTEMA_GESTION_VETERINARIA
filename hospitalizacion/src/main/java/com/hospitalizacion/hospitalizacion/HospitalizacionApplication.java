@@ -1,4 +1,4 @@
-package com.Tratamiento.Tratamiento;
+package com.hospitalizacion.hospitalizacion;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -8,10 +8,10 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @EnableDiscoveryClient
 @SpringBootApplication
 @EnableFeignClients
-public class TratamientoApplication {
+public class HospitalizacionApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(TratamientoApplication.class, args);
+		SpringApplication.run(HospitalizacionApplication.class, args);
 	}
 
 }
