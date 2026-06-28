@@ -26,7 +26,36 @@ spring:
               uri: lb://REGISTRO # 'lb://' activa el balanceador de carga usando el nombre en Eureka
               predicates:
                 - Path=/api/v1/registro/** # Cualquier petición que empiece con esto, se desvía a Registro
-
+            #Ruta del microservicio "facturarion"
+            - id: ruta-facturacion
+              uri: lb://facturacion
+              predicates:
+                - Path=/api/v1/factura/**
+            #Ruta del microservicio "tratamiento"
+            - id: ruta-tratamiento
+              uri: lb://Tratamiento
+              predicates:
+                - Path=/api/v1/tratamiento/**
+            #Ruta del microservicio "historial"
+            - id: ruta-historial
+              uri: lb://HistorialMascota
+              predicates:
+                - Path=/api/v1/historiales/**
+            #Ruta del microservicio "laboratorio"
+            - id: ruta-laboratorio
+              uri: lb://laboratorio
+              predicates:
+                - Path=/api/v1/laboratorio/**
+            #Ruta del microservicio "hospitalizacion"
+            - id: ruta-hospitalizacion
+              uri: lb://hospitalizacion
+              predicates:
+                - Path=/api/v1/hospitalizacion/**
+            #Ruta del microservicio "inventario"
+            - id: ruta-inventario
+              uri: lb://inventario
+              predicates:
+                  - Path=/api/v1/registro/inventario/**
 
 ---
 #La conexion con eureka
