@@ -181,6 +181,23 @@ services:
       networks:
         - veterinaria-net
 
+  # Identificacion
+  identificacion:
+    build: ./identificacion
+    container_name: identificacion-service
+    ports:
+      - "8085:8085"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/vet_identity_db?createDatabaseIfNotExist=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8100/eureka/
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - veterinaria-net
+
 networks:
   veterinaria-net:
     driver: bridge
