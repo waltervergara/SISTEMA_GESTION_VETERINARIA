@@ -32,3 +32,4 @@ public class PropietarioDTO {
     private String correo;
     
 }
+

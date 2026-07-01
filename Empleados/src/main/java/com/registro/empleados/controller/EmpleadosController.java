@@ -1,6 +1,6 @@
 package com.registro.empleados.controller;
 
-import com.registro.empleados.model.Empleados; 
+import com.registro.empleados.model.Empleados; // O Empleado si lo cambiaste a singular
 import com.registro.empleados.service.EmpleadosService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,11 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-// IMPORTACIONES HATEOAS
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-import org.springframework.hateoas.Link;
 
 @RestController
 @RequestMapping("/api/v1/registro/empleados")
@@ -98,21 +93,7 @@ public class EmpleadosController {
             Optional<Empleados> empleadoEncontrado = empleadosService.buscarPorRun(runEmpleado);
 
             if (empleadoEncontrado.isPresent()) {
-                // 1. Extraemos al empleado del Optional
-                Empleados empleado = empleadoEncontrado.get();
-
-                // 2. Fabricamos los links
-                Link selfLink = linkTo(methodOn(EmpleadosController.class).buscarPorRun(runEmpleado)).withSelfRel();
-                Link updateLink = linkTo(methodOn(EmpleadosController.class).actualizarEmpleado(runEmpleado, null)).withRel("actualizar");
-                Link deleteLink = linkTo(methodOn(EmpleadosController.class).eliminarPorRun(runEmpleado)).withRel("eliminar");
-
-                // 3. Añadimos los links
-                empleado.add(selfLink);
-                empleado.add(updateLink);
-                empleado.add(deleteLink);
-
-                // 4. Retornamos
-                return ResponseEntity.ok(empleado); // Devuelve 200 OK
+                return ResponseEntity.ok(empleadoEncontrado.get()); // Devuelve 200 OK
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Empleado no encontrado"); // Devuelve 404 Not Found
             }

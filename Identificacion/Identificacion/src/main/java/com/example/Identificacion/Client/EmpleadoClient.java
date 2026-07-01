@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 // Apuntamos a la URL EXACTA de tu controlador de Empleados
-@FeignClient(name = "empleado")
+@FeignClient(name = "empleado-service", url = "${empleados.service.url}")
 public interface EmpleadoClient {
 
     @PostMapping("/api/v1/registro/empleados") // ¡URL CORREGIDA!
