@@ -57,6 +57,17 @@ spring:
               predicates:
                   - Path=/api/v1/registro/inventario/**
 
+            #Ruta del microservicio "identificacion" - autenticacion
+            - id: ruta-auth
+              uri: lb://identificacion
+              predicates:
+                   - Path=/api/auth/**
+            #Ruta del microservicio "identificacion" - pruebas
+            - id: ruta-pruebas
+              uri: lb://identificacion
+              predicates:
+                - Path=/api/pruebas/**
+
 ---
 #La conexion con eureka
 eureka:
