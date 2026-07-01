@@ -33,12 +33,13 @@ public class JwtUtil {
                 .map(rol -> rol.getName())
                 .collect(Collectors.toSet());
 
+        // CORRECCIÓN VERSIÓN MODERNA: Se usa .setSubject(), .setExpiration(), .signWith()
         return Jwts.builder()
-                .subject(usuario.getUsername())
+                .setSubject(usuario.getUsername())
                 .claim("userId", usuario.getId())
                 .claim("roles", roles)
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey())
                 .compact();
     }
@@ -47,14 +48,13 @@ public class JwtUtil {
         return getClaims(token).getSubject();
     }
 
-    // MEJORA: Lectura ultra segura de los roles
     @SuppressWarnings("unchecked")
     public List<String> extractRoles(String token) {
         Object roles = getClaims(token).get("roles");
         if (roles instanceof List) {
             return (List<String>) roles;
         }
-        return List.of(); // Si no hay roles, devuelve lista vacía
+        return List.of(); 
     }
 
     public boolean isTokenValid(String token) {
@@ -67,11 +67,12 @@ public class JwtUtil {
         }
     }
 
+    // CORRECCIÓN VERSIÓN MODERNA: Para leer los datos correctamente en versiones estables
     private Claims getClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(getSigningKey())
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
                 .build()
-                .parseSignedClaims(token)
-                .getPayload();
+                .parseClaimsJws(token)
+                .getBody();
     }
 }
