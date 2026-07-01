@@ -22,7 +22,7 @@ public class CitaMedicaService {
     private PropietarioClient propietarioClient;
 
     @Autowired
-    private MascotaClient mascotaClient;
+    private  MascotaClient mascotaClient;
     @Autowired
     private EmpleadoClient empleadoClient;
 

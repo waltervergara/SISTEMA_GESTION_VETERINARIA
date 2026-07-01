@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: hospitalizacion
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/registro_hospitalizados
+    username: root
+    password: ""
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+  flyway:
+    enabled: true
+    repeatable-sql-migration-prefix: true
+
+  web:
+    error:
+      include-message: always
+      include-binding-errors: always
+
+server:
+  port: 8086
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8100/eureka/

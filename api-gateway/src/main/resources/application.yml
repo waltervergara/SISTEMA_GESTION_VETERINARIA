@@ -1,0 +1,80 @@
+server:
+  port: 9090 # La puerta de entrada principal para el sistema
+
+---
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: false # Le permite al Gateway buscar los nombres de los microservicios en Eureka
+          routes:
+            - id: ruta-citas
+              uri: lb://Citas # Debe coincidir exactamente con el name en su YML (o CITAS en mayúsculas si Eureka lo registra así)
+              predicates:
+                - Path=/api/v1/citas/**
+            - id: ruta-empleados
+              uri: lb://EMPLEADOS # Nombre exacto que pusiste en su YML
+              predicates:
+                - Path=/api/v1/registro/empleados/**
+            #Ruta del microservicio "registro"
+            - id: ruta-registro #en YAMl esto significa un nuevo elemento en la lista de rutas
+              uri: lb://REGISTRO # 'lb://' activa el balanceador de carga usando el nombre en Eureka
+              predicates:
+                - Path=/api/v1/registro/** # Cualquier petición que empiece con esto, se desvía a Registro
+            #Ruta del microservicio "facturarion"
+            - id: ruta-facturacion
+              uri: lb://facturacion
+              predicates:
+                - Path=/api/v1/factura/**
+            #Ruta del microservicio "tratamiento"
+            - id: ruta-tratamiento
+              uri: lb://Tratamiento
+              predicates:
+                - Path=/api/v1/tratamiento/**
+            #Ruta del microservicio "historial"
+            - id: ruta-historial
+              uri: lb://HistorialMascota
+              predicates:
+                - Path=/api/v1/historiales/**
+            #Ruta del microservicio "laboratorio"
+            - id: ruta-laboratorio
+              uri: lb://laboratorio
+              predicates:
+                - Path=/api/v1/laboratorio/**
+            #Ruta del microservicio "hospitalizacion"
+            - id: ruta-hospitalizacion
+              uri: lb://hospitalizacion
+              predicates:
+                - Path=/api/v1/hospitalizacion/**
+            #Ruta del microservicio "inventario"
+            - id: ruta-inventario
+              uri: lb://inventario
+              predicates:
+                  - Path=/api/v1/registro/inventario/**
+
+            #Ruta del microservicio "identificacion" - autenticacion
+            - id: ruta-auth
+              uri: lb://identificacion
+              predicates:
+                   - Path=/api/auth/**
+            #Ruta del microservicio "identificacion" - pruebas
+            - id: ruta-pruebas
+              uri: lb://identificacion
+              predicates:
+                - Path=/api/pruebas/**
+
+---
+#La conexion con eureka
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka-server:8100/eureka/
+---
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE

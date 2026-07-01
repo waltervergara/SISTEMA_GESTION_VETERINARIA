@@ -1,0 +1,203 @@
+version: '3.8'
+
+services:
+  # Eureka Server
+  eureka-server:
+    build: ./main
+    container_name: eureka-server
+    ports:
+      - "8100:8100"
+    networks:
+      - veterinaria-net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8100/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  # API Gateway
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "9090:9090"
+    environment:
+      - EUREKA_URL=http://eureka-server:8100/eureka/
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - veterinaria-net
+
+  # Registro
+  registro:
+    build: ./Registro
+    container_name: registro-service
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/Registro_Paciente
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8100/eureka/
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - veterinaria-net
+
+  # Empleados
+  empleados:
+    build: ./Empleados
+    container_name: empleados-service
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/registro_empleados
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8100/eureka/
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - veterinaria-net
+
+  # Citas
+  citas:
+    build: ./Citas
+    container_name: citas-service
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/Registro_Citas
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8100/eureka/
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - veterinaria-net
+
+  # Facturacion
+  facturacion:
+    build: ./Facturacion
+    container_name: facturacion-service
+    ports:
+      - "8088:8088"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/pagos_facturas
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8100/eureka/
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - veterinaria-net
+
+  # Tratamiento
+  tratamiento:
+    build: ./Tratamiento
+    container_name: tratamiento-service
+    ports:
+      - "8089:8089"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/registro_tratamiento
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8100/eureka/
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - veterinaria-net
+
+  # HistorialMascota
+  historial:
+    build: ./HistorialMascota
+    container_name: historial-service
+    ports:
+      - "8099:8099"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/Registro_Historiales
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8100/eureka/
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - veterinaria-net
+    # Laboratorio
+  laboratorio:
+      build: ./Laboratorio
+      container_name: laboratorio-service
+      ports:
+        - "8087:8087"
+      environment:
+        - SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/registro_laboratorio
+        - SPRING_DATASOURCE_USERNAME=root
+        - SPRING_DATASOURCE_PASSWORD=
+        - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8100/eureka/
+      depends_on:
+        eureka-server:
+          condition: service_healthy
+      networks:
+        - veterinaria-net
+
+    # Hospitalizacion
+  hospitalizacion:
+      build: ./Hospitalizacion
+      container_name: hospitalizacion-service
+      ports:
+        - "8086:8086"
+      environment:
+        - SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/registro_hospitalizados
+        - SPRING_DATASOURCE_USERNAME=root
+        - SPRING_DATASOURCE_PASSWORD=
+        - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8100/eureka/
+      depends_on:
+        eureka-server:
+          condition: service_healthy
+      networks:
+        - veterinaria-net
+
+    # Inventario
+  inventario:
+      build: ./Inventario
+      container_name: inventario-service
+      ports:
+        - "8083:8083"
+      environment:
+        - SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/registro_inventario
+        - SPRING_DATASOURCE_USERNAME=root
+        - SPRING_DATASOURCE_PASSWORD=
+        - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8100/eureka/
+      depends_on:
+        eureka-server:
+          condition: service_healthy
+      networks:
+        - veterinaria-net
+
+  # Identificacion
+  identificacion:
+    build: ./identificacion
+    container_name: identificacion-service
+    ports:
+      - "8085:8085"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/vet_identity_db?createDatabaseIfNotExist=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8100/eureka/
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - veterinaria-net
+
+networks:
+  veterinaria-net:
+    driver: bridge

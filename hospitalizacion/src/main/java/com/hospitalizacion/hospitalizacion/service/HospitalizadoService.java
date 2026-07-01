@@ -90,7 +90,7 @@ public class HospitalizadoService {
             //Al tener el objeto creado le colocaremos los datos de la hospitalizacion creada para despues mostrarlo al final
             detalleCompleto.setCodigoHospitalizacion(hospitalizado.getCodigoHospitalizacion());
             detalleCompleto.setSala(hospitalizado.getSala());;
-            detalleCompleto.setHora_monitoreo(hospitalizado.getHoraMonitoreo());;
+            detalleCompleto.setHoraMonitoreo(hospitalizado.getHoraMonitoreo());;
             detalleCompleto.setDescripcion(hospitalizado.getDescripcion());;
 
             //Aqui usamos la comunicacion de microservicios , aqui con los metodos del client traemos la informacion desde los otros servicios

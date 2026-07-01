@@ -7,7 +7,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @EnableDiscoveryClient
 @SpringBootApplication
-@EnableFeignClients
+@EnableFeignClients//la antena que permite comunarse con otros servicios creados
 public class CitasApplication {
 
 	public static void main(String[] args) {
