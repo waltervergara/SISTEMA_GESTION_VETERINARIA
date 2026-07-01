@@ -21,11 +21,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-// Importaciones obligatorias para HATEOAS
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-import org.springframework.hateoas.Link;
-
 import java.util.Optional;
 
 @RestController
@@ -55,7 +50,7 @@ public class CitaMedicaController {
                             schema = @Schema(type = "string", example = "Error interno al guardar en la base de datos"))),
     })
     @PostMapping("/guardar")
-     public ResponseEntity<?> guardarCita(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+    public ResponseEntity<?> guardarCita(@io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "Datos necesarios para crear una nueva cita médica",
             required = true,
             content = @Content(
@@ -100,7 +95,7 @@ public class CitaMedicaController {
                         schema = @Schema(type = "string" , example = "Error con el servidor")))
     })
     @GetMapping("/detalle/{codigoConsulta}")
-     public ResponseEntity<?> obtenerDetalleCita(@Parameter(
+    public ResponseEntity<?> obtenerDetalleCita(@Parameter(
             description = "Código único de la consulta médica que se desea consultar",
             required = true,
             example = "CITA-2026-001"
@@ -109,19 +104,11 @@ public class CitaMedicaController {
             Optional<CitaMedicaDTO> citaCompleta = citaMedicaService.obtenerDetalleCompletoCita(codigoConsulta);
 
             if (citaCompleta.isPresent()) {
-                CitaMedicaDTO dto = citaCompleta.get();
-        
-                Link selfLink = linkTo(methodOn(CitaMedicaController.class).obtenerDetalleCita(codigoConsulta)).withSelfRel();
-                Link updateLink = linkTo(methodOn(CitaMedicaController.class).actualizarCita(codigoConsulta, null)).withRel("actualizar");
-                Link deleteLink = linkTo(methodOn(CitaMedicaController.class).eliminarPorCodigoConsulta(codigoConsulta)).withRel("eliminar");
-        
-                dto.add(selfLink, updateLink, deleteLink);
-
-                return ResponseEntity.ok(dto);
+                return ResponseEntity.ok(citaCompleta.get());
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("No se encontró ninguna cita con el código: " + codigoConsulta);
-    }
+                        .body("No se encontró ninguna cita con el código: " + codigoConsulta);
+            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error al obtener los detalles de la cita: " + e.getMessage());
@@ -213,7 +200,7 @@ public class CitaMedicaController {
     }
 
     //Get exlusivo para el Historial
-     @Operation(
+    @Operation(
             summary = "Obtener historial de citas por microchip",
             description = "Busca y devuelve todas las citas médicas asociadas al código de microchip de una mascota para armar su historial clínico."
     )
@@ -242,27 +229,16 @@ public class CitaMedicaController {
             example = "981020000394857"
     )@PathVariable String codigoMicrochip) {
         try {
+            // Llamamos al nuevo método que acabamos de crear
             List<CitaMedicaDTO> listaCitas = citaMedicaService.obtenerCitasPorMicrochip(codigoMicrochip);
 
             if (!listaCitas.isEmpty()) {
-                // IMPLEMENTACIÓN DE HATEOAS RECORRIENDO LA LISTA DE CITAS
-                for (CitaMedicaDTO dto : listaCitas) {
-                    Link selfLink = linkTo(methodOn(CitaMedicaController.class)
-                            .obtenerDetalleCita(dto.getCodigoConsulta())).withSelfRel();
-                    
-                    Link updateLink = linkTo(methodOn(CitaMedicaController.class)
-                            .actualizarCita(dto.getCodigoConsulta(), null)).withRel("actualizar");
-                    
-                    dto.add(selfLink, updateLink);
-                }
-
                 return ResponseEntity.ok(listaCitas);
             } else {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); 
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al obtener las citas: " + e.getMessage());
-        }
     }
 }
 
@@ -272,3 +248,7 @@ public class CitaMedicaController {
     //get-http://localhost:8082/api/v1/citas/detalle/
     //put-http://localhost:8082/api/v1/citas/actualizar/
     //delete-http://localhost:8082/api/v1/citas/eliminar/
+
+    //Link para documentacion Swagger UI
+    //http://localhost:8082/swagger-ui.html
+}

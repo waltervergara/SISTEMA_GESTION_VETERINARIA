@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import Registro.Citas.Modelo.MascotaDTO;
 
 
-@FeignClient(name = "microservicio-registro-mascota" , url = "http://localhost:8080")
+@FeignClient(name = "registro")
 public interface MascotaClient {
 
     @GetMapping("/api/v1/registro/mascotas/buscar/{codigoMicrochip}")

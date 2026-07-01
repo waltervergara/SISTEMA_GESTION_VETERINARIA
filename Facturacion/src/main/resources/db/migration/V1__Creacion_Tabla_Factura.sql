@@ -1,6 +1,3 @@
-
-
-
 CREATE TABLE Factura (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     codigo_factura VARCHAR(255) NOT NULL,
