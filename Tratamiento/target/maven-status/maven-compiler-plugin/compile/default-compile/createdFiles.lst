@@ -1,0 +1,9 @@
+com\Tratamiento\Tratamiento\Model\TratamientoDTO.class
+com\Tratamiento\Tratamiento\Service\TratamientoService.class
+com\Tratamiento\Tratamiento\Client\MascotaClient.class
+com\Tratamiento\Tratamiento\TratamientoApplication.class
+com\Tratamiento\Tratamiento\Repository\TratamientoRepository.class
+com\Tratamiento\Tratamiento\Controller\TratamientoController.class
+com\Tratamiento\Tratamiento\Model\Tratamiento.class
+com\Tratamiento\Tratamiento\Exceptions\Exceptions.class
+com\Tratamiento\Tratamiento\Model\MascotaDTO.class
