@@ -1,0 +1,6 @@
+com\inventario\inventario\repository\InventarioRepository.class
+com\inventario\inventario\InventarioApplication.class
+com\inventario\inventario\controller\InventarioController.class
+com\inventario\inventario\service\InventarioService.class
+com\inventario\inventario\Exceptions\Exceptions.class
+com\inventario\inventario\model\Inventario.class
