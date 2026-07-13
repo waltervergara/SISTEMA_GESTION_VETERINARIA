@@ -1,0 +1,9 @@
+com\registro\laboratorio\repository\LabOrdenRepository.class
+com\registro\laboratorio\model\MascotaDTO.class
+com\registro\laboratorio\controller\LabOrdenController.class
+com\registro\laboratorio\Exceptions\Exceptions.class
+com\registro\laboratorio\model\LabOrdenDTO.class
+com\registro\laboratorio\service\LabOrdenService.class
+com\registro\laboratorio\LaboratorioApplication.class
+com\registro\laboratorio\client\MascotaClient.class
+com\registro\laboratorio\model\LabOrden.class
