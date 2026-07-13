@@ -3,9 +3,14 @@
 server:
   port: 8080
 
+
 spring:
   application:
     name: Registro
+
+  hateoas:
+    use-hal-as-default-json-media-type: true
+
 
   datasource:
     url: jdbc:mysql://localhost:3306/Registro_Paciente
@@ -25,7 +30,11 @@ spring:
       include-binding-errors: always
       include-message: always
 
+
+
+
+
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://eureka-server-:8100/eureka/
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8100/eureka/}
