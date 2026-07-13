@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: Registro.Citas.Service.CitaMedicaServiceTest
+-------------------------------------------------------------------------------
+Tests run: 17, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.297 s -- in Registro.Citas.Service.CitaMedicaServiceTest
