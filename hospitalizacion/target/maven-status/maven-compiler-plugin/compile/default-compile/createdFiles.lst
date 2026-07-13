@@ -1,0 +1,9 @@
+com\hospitalizacion\hospitalizacion\model\HospitalizadoDTO.class
+com\hospitalizacion\hospitalizacion\model\Hospitalizado.class
+com\hospitalizacion\hospitalizacion\HospitalizacionApplication.class
+com\hospitalizacion\hospitalizacion\repository\HospitalizadoRepository.class
+com\hospitalizacion\hospitalizacion\Exceptions\Exceptions.class
+com\hospitalizacion\hospitalizacion\client\MascotaClient.class
+com\hospitalizacion\hospitalizacion\service\HospitalizadoService.class
+com\hospitalizacion\hospitalizacion\controller\HospitalizacionController.class
+com\hospitalizacion\hospitalizacion\model\MascotaDTO.class
