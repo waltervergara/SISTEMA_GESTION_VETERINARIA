@@ -23,16 +23,16 @@ microservicios:
 
 Documentacion Swagger
 
-1. Citas    http://localhost:8082/swagger-ui
-2. Empleados    http://localhost:8081/swagger-ui
-3. Facturacion    http://localhost:8088/swagger-ui
-4. Historial Mascotas    http://localhost:8099/swagger-ui
-5. Identificacion    http://localhost:8085/swagger-ui
-6. Inventario    http://localhost:8083/swagger-ui
-7. Registro    http://localhost:8080/swagger-ui
-8. Tratamiento    http://localhost:8089/swagger-ui
-9. Hospitalizacion    http://localhost:8086/swagger-ui
-10. Laboratorio    http://localhost:8087/swagger-ui
+1. Citas    http://localhost:8082/swagger-ui.html
+2. Empleados    http://localhost:8081/swagger-ui.html
+3. Facturacion    http://localhost:8088/swagger-ui.html
+4. Historial Mascotas    http://localhost:8099/swagger-ui.html
+5. Identificacion    http://localhost:8085/swagger-ui.html
+6. Inventario    http://localhost:8083/swagger-ui.html
+7. Registro    http://localhost:8080/swagger-ui.html
+8. Tratamiento    http://localhost:8089/swagger-ui.html
+9. Hospitalizacion    http://localhost:8086/swagger-ui.html
+10. Laboratorio    http://localhost:8087/swagger-ui.html
 
 
 
